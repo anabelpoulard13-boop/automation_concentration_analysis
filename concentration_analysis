@@ -115,9 +115,10 @@ def csv_list(new_table, file_name):
     print(csv_df)
 
 def main():
-    blank_well = 'O6' # Well with no sample 0ng/ul
-    sample_well = 'A6' # Well with sample
-    sample_concentration = 100
+
+    blank_well = input("Enter the blank well (e.g. A1): ").strip().upper()
+    sample_well = input("Enter the sample well (e.g. B2): ").strip().upper()
+    sample_concentration = float(input("Enter the sample concentration (ng/ul): ").strip())
 
     file_path = input("Enter the path to your CSV file: ")#.strip()
 

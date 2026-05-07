@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import string
 import matplotlib.pyplot as plt
+import argparse
 
 def load_file(file_path):
 
@@ -109,26 +110,27 @@ def csv_list(new_table, file_name):
     print(csv_df)
 
 def main():
+    
+    parser = argparse.ArgumentParser(description=" Analyse the concentration of samples from raw fluorescence values")
+    parser.add_argument("file_path", help="Path to the CSV file")
+    args = parser.parse_args()
 
     blank_well = input("Enter the blank well (e.g. A1): ").strip().upper()
     sample_well = input("Enter the sample well (e.g. B2): ").strip().upper()
     sample_concentration = float(input("Enter the sample concentration (ng/ul): ").strip())
 
-    file_path = input("Enter the path to your CSV file: ")#.strip()
-
     while True:
-        if not os.path.exists(file_path):
-            print(f"✗ File not found: '{file_path}'")
-        elif os.path.isdir(file_path):
+        if not os.path.exists(args.file_path):
+            print(f"✗ File not found: '{args.file_path}'")
+        elif os.path.isdir(args.file_path):
             print(f"✗ That's a folder, not a file. Please include the filename (e.g. /Users/you/Desktop/data.csv)")
-        elif not file_path.lower().endswith('.csv'):
+        elif not args.file_path.lower().endswith('.csv'):
             print(f"✗ File must be a .csv file")
         else:
             break
-        file_path = input("Enter the path to your CSV file: ")#.strip()
-    file_name = os.path.basename(file_path).replace('.csv', '')
+    file_name = os.path.basename(args.file_path).replace('.csv', '')
     
-    table_data = load_file(file_path)
+    table_data = load_file(args.file_path)
     zero_point_value, point_value = variable_application(table_data, blank_well, sample_well, sample_concentration)
     calculate_concentration = concentration_calculation(zero_point_value, point_value, 0, sample_concentration)
     new_table = calculation_application(table_data, calculate_concentration, zero_point_value, point_value, 0, sample_concentration)

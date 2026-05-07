@@ -89,14 +89,14 @@ def calculation_application(table_data, calculate_concentration, zero_point_valu
     new_table['Row_Label'] = table_data['Row_Label']
     return new_table
 
-def excel_export(new_table, file_name):
-    if not os.path.exists('result'):
-        os.mkdir('result')
+def excel_export(new_table, file_name, output_folder):
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
     data_table = new_table.copy()
     data_table['Row_Label'] = new_table['Row_Label']
-    data_table.to_excel(f'result/{file_name}_data_table.xlsx', index=False)
+    data_table.to_excel(os.path.join(output_folder, f'{file_name}_data_table.xlsx'), index=False)
 
-def csv_list(new_table, file_name):
+def csv_list(new_table, file_name, output_folder):
     rows = []
     for i, row in new_table.iterrows():
         row_label = row['Row_Label']
@@ -105,7 +105,7 @@ def csv_list(new_table, file_name):
             if pd.notna(value) and value != '':
                 rows.append({'Well': f"{row_label}{col}", 'Concentration_ng_ul': value})
     csv_df = pd.DataFrame(rows)
-    csv_df.to_csv(f'result/{file_name}_well_concentrations.csv', index=False)
+    csv_df.to_csv(os.path.join(output_folder, f'{file_name}_well_concentrations.csv'), index=False)
     print(f"Saved {len(csv_df)} wells to CSV!")
     print(csv_df)
 
@@ -129,12 +129,14 @@ def main():
         else:
             break
     file_name = os.path.basename(args.file_path).replace('.csv', '')
+    directory = os.path.dirname(args.file_path)
+    output_folder = os.path.join(directory, 'result')
     
     table_data = load_file(args.file_path)
     zero_point_value, point_value = variable_application(table_data, blank_well, sample_well, sample_concentration)
     calculate_concentration = concentration_calculation(zero_point_value, point_value, 0, sample_concentration)
     new_table = calculation_application(table_data, calculate_concentration, zero_point_value, point_value, 0, sample_concentration)
-    excel_export(new_table, file_name)
-    csv_list(new_table, file_name)
+    excel_export(new_table, file_name, output_folder)
+    csv_list(new_table, file_name, output_folder)
 if __name__ == "__main__":
     main()
